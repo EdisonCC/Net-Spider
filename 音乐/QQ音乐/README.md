@@ -65,3 +65,23 @@ guid=7238047136
 &uin=4689&
 fromtag=38
 ```
+
+<hr>
+
+2021-01-22:
+
+感谢 [Ravizhan](https://github.com/ravizhan) 提供的QQ音乐新解决方案，[程序源代码](./QQNewVersion.py)
+
+我理了一下解析原理，针对里面的三个关键 `guid`,`uin`,`key` 的来源进行简单说明
+
+1. 网页进行登陆后（**利用QQ登录的话，那uin就是QQ号**），随便找一首歌，进入页面播放
+
+   - ![QQ播放界面](./images/qq.png)
+
+2. 右键检查元素，在`XHR`下找到带有 `https://u.y.qq.com/cgi-bin/musics.fcg`的请求
+
+   - ![关键字](./images/keyword.png)
+
+3. 每一个账号的 `guid`,`uin`,`key` 应该是基本不变的，唯一的
+
+
