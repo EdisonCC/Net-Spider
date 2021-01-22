@@ -1,14 +1,18 @@
+# -*- coding:utf-8 -*-
+import json
 import execjs
 import requests
-from urllib import parse
-import json
+
 '''
-QQ音乐爬取/解析
-作者:Ravizhan
+Purpose: QQ音乐爬取/解析
+Author: Ravizhan
+Github: https://github.com/ravizhan
 '''
+
+
 # 获取sign参数
 def sign(a):
-    #利用execjs模拟执行加密js，减少工作量，但效率较低
+    # 利用execjs模拟执行加密js，减少工作量，但效率较低
     js = execjs.compile('''
     var n = function() {
             if ("undefined" != typeof self)
@@ -153,49 +157,77 @@ def sign(a):
     ''')
     return js.call('getSign', a)
 
+
 # 获取下载地址
-def getdownloadurl(song_mid):
+def download_url(song_mid):
     song_mid = song_mid.replace("'", "\"")
-    # 此处的guid和uin都是每个账号唯一的
-    # 这里用的是我自己的(非vip，没钱..)，无法下载vip歌曲，有vip账号的可以更换uin和guid试试
+    """
+        0x01. 此处的guid和uin都是每个账号唯一的
+        0x02. 这里用的是我自己的(非vip，没钱..)，无法下载vip歌曲，有vip账号的可以更换uin和guid试试
+        0x03. 至于guid，uin，key的来源，请参考同级目录下的README.md
+    """
+    url = "https://u.y.qq.com/cgi-bin/musics.fcg"
+    guid = "XXXXXXXXX"
+    uin = "XXXXXXXXXX"
+    key = "XXXXXXXXXXXXX"
     sec = {
         "req": {
             "module": "CDN.SrfCdnDispatchServer",
             "method": "GetCdnDispatch",
             "param": {
-                "guid": "5294554992",
+                "guid": guid,
                 "calltype": 0,
-                "userip": ""}},
+                "userip": ""
+            }
+        },
         "req_0": {
             "module": "vkey.GetVkeyServer",
             "method": "CgiGetVkey",
             "param": {
-                "guid": "5294554992",
+                "guid": guid,
                 "songmid": [song_mid],
                 "songtype": [0],
-                "uin": "2876473037",
+                "uin": uin,
                 "loginflag": 1,
-                "platform": "20"}},
+                "platform": "20"
+            }
+        },
         "comm": {
-            "uin": 2876473037,
+            "uin": int(uin),
             "format": "json",
             "ct": 24,
-            "cv": 0}}
-    params = '''{"req":{"module":"CDN.SrfCdnDispatchServer","method":"GetCdnDispatch","param":{"guid":"5294554992","calltype":0,"userip":""}},"req_0":{"module":"vkey.GetVkeyServer","method":"CgiGetVkey","param":{"guid":"5294554992","songmid":["%s"],"songtype":[0],"uin":"2876473037","loginflag":1,"platform":"20"}},"comm":{"uin":2876473037,"format":"json","ct":24,"cv":0}}''' % (
-        song_mid)
-    url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=getplaysongvkey4888498303971036&g_tk=1810605017&sign=' + \
-          sign(sec) + '&loginUin=1&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=' + parse.quote(params)
-    text = requests.get(url).text
-    text = json.loads(text)
-    return [
-        text['req_0']['data']['sip'][0] +
-        text['req_0']['data']['midurlinfo'][0]['purl'],
-        text['req_0']['data']['sip'][1] +
-        text['req_0']['data']['midurlinfo'][0]['purl']]
+            "cv": 0
+        }
+    }
+    headers = {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/85.0.4183.102 Safari/537.36 ",
+    }
+
+    try:
+        # ★★★ 此处的parameter必须这样写，写成不占换行符
+        parameter = '''{"req":{"module":"CDN.SrfCdnDispatchServer","method":"GetCdnDispatch","param":{"guid":"%s","calltype":0,"userip":""}},"req_0":{"module":"vkey.GetVkeyServer","method":"CgiGetVkey","param":{"guid":"%s","songmid":["%s"],"songtype":[0],"uin":"%s","loginflag":1,"platform":"20"}},"comm":{"uin":%s,"format":"json","ct":24,"cv":0}}''' % (
+        guid, guid, song_mid, uin, uin)
+        params = {
+            "-": key,
+            "format": "json",
+            "sign": sign(sec),
+            "loginUin": uin,
+            "data": parameter
+        }
+        response = requests.get(url=url, params=params, headers=headers, timeout=10)
+        if response.status_code == 200:
+            text = response.json()
+            return [text['req_0']['data']['sip'][0] + text['req_0']['data']['midurlinfo'][0]['purl'],
+                    text['req_0']['data']['sip'][1] + text['req_0']['data']['midurlinfo'][0]['purl']]
+        else:
+            print(response.status_code)
+    except Exception as e:
+        print(e)
 
 
 def search(song_name):
-    song_mid, song_url, song_res_name,singer = [], [], [], []
+    song_mid, song_url, song_res_name, singer = [], [], [], []
     text = requests.get(
         'https://c.y.qq.com/soso/fcgi-bin/client_search_cp?p=1&n=10&format=json&w=' +
         song_name).text
@@ -215,6 +247,6 @@ if __name__ == '__main__':
         print('%d.歌曲名：%s  歌手：%s\n地址：%s' % (i + 1, song_res_name[i], singer[i], song_url[i]))
     choice = input('请选择一首[1~10]：')
     choice = int(choice) - 1
-    print('下载地址1：' + getdownloadurl(song_mid[choice])[0])
-    print('下载地址2：' + getdownloadurl(song_mid[choice])[1])
+    print('下载地址1：' + download_url(song_mid[choice])[0])
+    print('下载地址2：' + download_url(song_mid[choice])[1])
     input('按任意键退出')
