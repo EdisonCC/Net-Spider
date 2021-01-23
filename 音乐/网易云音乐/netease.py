@@ -1,5 +1,18 @@
-import requests, json, execjs, base64
+# -*- coding:utf-8 -*-
+import json
+import base64
+import execjs
+import random
+import requests
 from Crypto.Cipher import AES
+
+
+def random_generate(number):
+    b = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    c = ""
+    for i in range(number):
+        c += b[int(random.random() * len(b))]
+    return c
 
 
 class Netease:
@@ -7,18 +20,18 @@ class Netease:
     Purpose: 网易云音乐爬取/解析
     Author: Ravizhan
     Github: https://github.com/ravizhan
-    
+
     + 大概的解析流程：
         1. 通过两次AES CBC加密，获取params参数
         2. 调用execjs执行加密js，获取encSecKey参数
         3. 整合参数，发送post请求
-    
+
     + 参数说明：
         + p:随机生成16位的字符串
         + key:固定的AES密钥
         + iv:固定的AES偏移量
         + id:网易云音乐每首歌对应的唯一id 例:https://music.163.com/#/song?id=355992
-    
+
     + 注:AES加密部分参考自 https://zhuanlan.zhihu.com/p/184968023
         之前试了很多方法都实现不了AES CBC加密，本来是调用在线加密api进行加密的，但是效率过于低下
         直到看到了那篇文章.....
@@ -29,15 +42,7 @@ class Netease:
         self.iv = iv.encode('utf-8')
         # 随机生成16位的字符串
         # 貌似不用每次都重新生成(管他呢)
-        js1 = execjs.compile('''
-                        function a(a) {
-                            var d, e, b = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-                                c = "";
-                            for (d = 0; a > d; d += 1) e = Math.random() * b.length, e = Math.floor(e), c += b.charAt(e);
-                            return c
-                        }
-                        ''')
-        self.p = js1.call('a', 16)
+        self.p = random_generate(16)
 
     def pkcs7padding(self, text):
         """
@@ -51,7 +56,7 @@ class Netease:
         padding_text = chr(padding) * padding
         return text + padding_text
 
-    def aes_encrypt(self,content,key='0CoJUm6Qyw8W8jud'):
+    def aes_encrypt(self, content, key='0CoJUm6Qyw8W8jud'):
         """
         AES加密
         """
@@ -72,7 +77,7 @@ class Netease:
         res = self.aes_encrypt(string)
         # 进行第二次加密
         # 此处的key为一开始随机生成的(固定的貌似也行)，iv还是0102030405060708
-        res = self.aes_encrypt(res,self.p)
+        res = self.aes_encrypt(res, self.p)
         return res
 
     def get_encSecKey(self):
@@ -80,7 +85,8 @@ class Netease:
         with open('crack.js', 'r')as f:
             code = f.read()
         js = execjs.compile(code)
-        enc = js.call('c', self.p, '010001','00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7')
+        enc = js.call('c', self.p, '010001',
+                      '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7')
         return enc
 
     def search(self, params, enc):
@@ -90,7 +96,7 @@ class Netease:
             'params': params,
             'encSecKey': enc
         }
-        #print(data)
+        # print(data)
         text = requests.post('https://music.163.com/weapi/cloudsearch/get/web?csrf_token=', data=data).text
         res = json.loads(text)
         # 解析返回的json
@@ -103,14 +109,14 @@ class Netease:
         # 此处获取params的方法与get_params函数相同
         string = '{"ids":"[%s]","level":"standard","encodeType":"aac","csrf_token":""}' % id
         params = self.aes_encrypt(string)
-        params = self.aes_encrypt(params,self.p)
+        params = self.aes_encrypt(params, self.p)
         enc = self.get_encSecKey()
         url = 'https://music.163.com/weapi/song/enhance/player/url/v1?csrf_token='
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36'
         }
-        text = requests.post(url,data={'params':params,'encSecKey':enc},headers=headers).text
+        text = requests.post(url, data={'params': params, 'encSecKey': enc}, headers=headers).text
         res = json.loads(text)
         return res['data'][0]['url']
 
