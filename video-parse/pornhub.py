@@ -24,6 +24,11 @@ from pyquery import PyQuery as pq
             quality_1080p = sdias+shdas+asda
                           = "https://dv.phncdn.com/videos/202009/03/348554751/1080P" 
     - js2py执行切片好的js文件，构建成一个标准函数：返回flashvars_视频id的值（flashvars_348554751为对象格式）
+    
+    + 2021-02-22 Pornhub新版加密原理：
+        - js2py执行的后的flashvars_348554751返回结果中的mediaDefinitions为一个数组
+        - 数组中的尾数就是其真实的视频请求地址链接LinkApi
+        - 再一次请求这个LinkApi，返回结果包含各种视频格式及其播放地址
 """
 
 
@@ -109,19 +114,15 @@ class PornHub(object):
                 doc = str(doc.split("playerObjList")[0]).strip()
                 # find the object of property
                 flash_vars = re.findall('flashvars_\d+', doc)[0]
-                message = js2py.eval_js("".join(doc) + flash_vars)
+                message = js2py.eval_js("".join(doc) + flash_vars).to_dict()
                 # default to choose the best quality
-                cover = message.image_url
-                title = message.video_title
+                cover = message["image_url"]
+                title = message["video_title"]
                 quality = []
-                if message.quality_1080p:
-                    quality.append(message.quality_1080p)
-                if message.quality_720p:
-                    quality.append(message.quality_720p)
-                elif message.quality_480p:
-                    quality.append(message.quality_480p)
-                elif message.quality_240p:
-                    quality.append(message.quality_240p)
+                if message["mediaDefinitions"]:
+                    video_url = message["mediaDefinitions"][-1]["videoUrl"]
+                    result = self.session.get(url=video_url, headers=self.headers, timeout=40)
+                    quality = json.loads(result.text)
                 else:
                     quality.append('parse url error')
                 info = {
@@ -164,7 +165,8 @@ class PornHub(object):
 
 
 if __name__ == '__main__':
-    pornhub = PornHub("https://pornhub.com/view_video.php?viewkey=ph5fb3ecc30d210")
+    pornhub = PornHub("https://cn.pornhub.com/view_video.php?viewkey=ph5dbfea0f14489")
     urls = json.loads(pornhub.parse())
-    pornhub.download("./pornhubs/", urls["title"], urls["quality"][0])
+    print(urls)
+    # pornhub.download("./pornhubs/", urls["title"], urls["quality"][-1]["videoUrl"])
     # pornhub.get_keys("mv", 1, 5)
