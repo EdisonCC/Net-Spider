@@ -26,6 +26,7 @@
 | CSDN文章  | ✔ | [轻小说爬取](./轻小说与动漫列表大全/README.md) | ✔ | [陌陌登录](./模拟登录/陌陌) | ✔ |
 | 马蜂窝 | ✔ | [Pixiv](./国外网站/Pixiv/README.md) |✔ | [YouTube](./国外网站/YouTube/README.md)|✔ |
 | [奇漫屋](./漫画/奇漫屋) | ✔ | [Pornhub](./video-parse/pornhub.py) | ✔ | [QQ音乐](./音乐/QQ音乐/README.md) | ✔ |
+| [网易云音乐](./音乐/网易云音乐/README.md) | ✔ |  |  |  |  |
 
 <br>
 
@@ -52,6 +53,16 @@
    - 2020-09-28 持续更新短视频无水印解析入口
    - 2020-11-10 更新修复失效解析接口
    - 2020-11-28 新增【**Pornhub/Pixiv**】视频下载解析接口
+   - 2021-01-23 【[Ravizhan](https://github.com/ravizhan)】更新【QQ音乐/网易云音乐】解析原理
+
+### 合作开发者
+
+***谨献给那些即使饱受创伤，仍坚守奋斗的每一位贡献者***
+
+   - [FioraLove](https://github.com/FioraLove)
+   - [Ravizhan](https://github.com/ravizhan)  一位超级优秀的开源贡献者，21年初三😝😝😝
+
+
 
 ### 最近方向
 
