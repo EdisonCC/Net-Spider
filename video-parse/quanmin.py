@@ -14,7 +14,7 @@ class QuanMin(object):
         self.url = url
         self.session = requests.Session()
 
-    def get_info(self):
+    def get_video(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
             "upgrade-insecure-requests": "1"
@@ -33,4 +33,4 @@ class QuanMin(object):
 
 if __name__ == '__main__':
     quanmin = QuanMin("https://quanmin.baidu.com/v/4678495584199446289")
-    print(quanmin.get_info())
+    print(quanmin.get_video())

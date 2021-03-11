@@ -51,4 +51,3 @@ class Bili(object):
 if __name__ == '__main__':
     bili = Bili("https://haokan.baidu.com/v?vid=11231414361411904045")
     print(bili.get_url())
-© 2020 GitHub, Inc.
