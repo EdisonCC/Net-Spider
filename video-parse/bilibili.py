@@ -27,7 +27,7 @@ class BiLiBiLi(object):
                           'Chrome/85.0.4183.121 Safari/537.36 Edg/85.0.564.63 '
         }
 
-    def get_video(self):
+    def parse(self):
         try:
             rows = self.session.get(url=self.url, headers=self.headers, timeout=10)
             if rows.status_code == 200:
@@ -76,7 +76,7 @@ class BiLiPhone(object):
         self.bv = bv
         self.session = requests.Session()
 
-    def get_video(self):
+    def get_url(self):
         url = self.bv
         if len(url) >= 16:
             base_url = url
@@ -100,7 +100,7 @@ class BiLiPhone(object):
                     rows = {
                         "bvid": bvid,
                         "cover": "https:" + readyPoster,
-                        "video_url": readyVideoUrl,
+                        "video_url": "https:" + readyVideoUrl,
                         "duration": readyDuration
                     }
                     return json.dumps(rows, ensure_ascii=False)
@@ -119,11 +119,11 @@ def core():
     deal_url = re.findall('(http[s]?://[^\s]+)', share_url, re.S)[0]
     choice = int(input("1、模拟手机端下载  2、调用接口下载  3、直接下载\n选择下载方式："))
     if choice == 1:
-        return BiLiPhone(deal_url).get_video()
+        return BiLiPhone(deal_url).get_url()
     if choice == 2:
         return "暂无，西蒂蒙"
     if choice == 3:
-        return BiLiBiLi(deal_url).get_video()
+        return BiLiBiLi(deal_url).parse()
 
 
 if __name__ == '__main__':
