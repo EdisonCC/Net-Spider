@@ -17,7 +17,7 @@ class Before(object):
         self.url = url
         self.session = requests.Session()
 
-    def get_video(self):
+    def parse(self):
         try:
             # 处理url，获取视频id
             pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
@@ -59,4 +59,4 @@ class Before(object):
 
 if __name__ == '__main__':
     before = Before("https://m.hanyuhl.com/detail/61711447?shareId=497719724")
-    print(before.get_video())
+    print(before.parse())

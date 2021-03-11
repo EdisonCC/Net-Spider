@@ -18,7 +18,7 @@ class LvZhou(object):
         self.url = url
         self.session = requests.Session()
 
-    def get_video(self):
+    def parse(self):
         try:
             # 处理url，获取视频id
             pattern = re.compile('(http[s]?://[^\s]+)', re.S)
@@ -56,4 +56,4 @@ class LvZhou(object):
 
 if __name__ == '__main__':
     lv_zhou = LvZhou("https://m.oasis.weibo.cn/v1/h5/share?sid=4506676592820518")
-    print(lv_zhou.get_video())
+    print(lv_zhou.parse())

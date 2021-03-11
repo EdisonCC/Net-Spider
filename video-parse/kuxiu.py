@@ -55,7 +55,7 @@ class KuXiu(object):
     def get_uid():
         return hex(int((1 + random.random()) * 65536) | 0)[3:]
 
-    def get_video(self):
+    def parse(self):
         try:
             # 处理url，获取视频id
             pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
@@ -126,4 +126,4 @@ class KuXiu(object):
 if __name__ == '__main__':
     ku_xiu = KuXiu("https://www.17kuxiu.com/h5/share/share-short-video.html?userId=1171411&pubid"
                    "=5ec5afd62bcf565a9f317fc9&uid=1545617&downType=1&timestamp=1604719152")
-    print(ku_xiu.get_video())
+    print(ku_xiu.parse())

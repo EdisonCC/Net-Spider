@@ -17,7 +17,7 @@ class DouPai(object):
         self.url = url
         self.session = requests.Session()
 
-    def get_video(self):
+    def parse(self):
         try:
             # 处理url，获取视频id
             pattern = re.compile('(http[s]?://[^\s]+)', re.S)
@@ -54,4 +54,4 @@ class DouPai(object):
 
 if __name__ == '__main__':
     dou_pai = DouPai("出国证 https://p.doupai.cc/#/topic/5fa20d8c8f71d10031f27abb.html")
-    print(dou_pai.get_video())
+    print(dou_pai.parse())
