@@ -13,6 +13,7 @@ import requests
         "https://c.kuaishou.com/fw/photo/3xbjz7dvcx6qj3a?fid=2096594305&cc=share_copylink&followRefer=151&photoId=3xbjz7dvcx6qj3a&userId=3xkvt27kw2i6xbe"
     3. 提取重定向后的url地址中的photoId的值
     4. 对 https://video.kuaishou.com/graphql发送post请求，目标数据就在返回的json数据中
+    
   - WEB端：
     1. web端的url形如：https://video.kuaishou.com/short-video/3x39cpt7868qp2i?authorId=3xk4tvmdvq72fqs&streamSource=find
 """
@@ -32,7 +33,13 @@ class KuaiShou(object):
         try:
             pattern = re.compile(r'(http[s]?://[^\s]+)', re.S)
             deal_url = re.findall(pattern, self.url)[0]
-            # 处理url,获取视频id
+            """
+            处理url,判断设备类型web或mobile,获取视频id
+            - mobile上的url形如"https://v.kuaishou.com/5FGpDa"
+            - web上的url形如"https://video.kuaishou.com/short-video/3x39cpt7868qp2i?authorId=3xk4tvmdvq72fqs&streamSource=find"
+                如果通过分析域名来判断设备类别,有可能域名后续会更换.如果通过视频url长度来判断的话,移动端的url长度应该不会超过四十个字符吧
+            """
+
             if len(deal_url) >= 36:
                 photo_id = re.findall("video\/(.*?)\?", self.url, re.S)[0]
                 headers["Host"] = "video.kuaishou.com"
@@ -40,7 +47,7 @@ class KuaiShou(object):
                 headers["Referer"] = deal_url
             else:
                 response = self.session.get(url=deal_url, headers=headers, timeout=10)
-                # 正则匹配提取photoId
+                # 正则匹配提取移动端photoId
                 photo_id = re.findall("photoId=(.*?)&", response.url, re.S)[0]
             api = "https://video.kuaishou.com/graphql"
             data = {
@@ -83,6 +90,11 @@ class KuaiShou(object):
 
 
 if __name__ == '__main__':
-    kuaishou = KuaiShou(
-        "因为我经常熬夜 所以他们叫我小心肝#我超甜 #宝藏女孩 #婴儿肥 https://video.kuaishou.com/short-video/3x39cpt7868qp2i?authorId=3xk4tvmdvq72fqs&streamSource=find 复制此消息，打开【快手】直接观看！")
-    print(kuaishou.get_video())
+    print("############### Web端解析 ################")
+    ks_web = KuaiShou("#我超甜 #宝藏女孩 #婴儿肥 https://video.kuaishou.com/short-video/3x5j6vt2wkq4a2s?authorId"
+                      "=3xvuuywgds3338q&streamSource=find&area=homexxbrilliant 复制此消息，打开【快手】直接观看！")
+    print(ks_web.get_video())
+    
+    print("############### Mobile端解析 ################")
+    ks_mobile = KuaiShou("我要努力 我要奋斗 当个大老板 别墅靠大海 未来 加油！ https://v.kuaishou.com/cv2KST 复制此消息")
+    print(ks_mobile.get_video())
