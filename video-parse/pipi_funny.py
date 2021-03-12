@@ -18,7 +18,7 @@ class PiPiFunny(object):
         self.url = url
         self.session = requests.Session()
 
-    def parse(self):
+    def get_video(self):
         try:
             # 处理url，获取视频id
             pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
@@ -65,4 +65,4 @@ if __name__ == '__main__':
     pipi_funny = PiPiFunny("https://h5.ippzone.com/pp/post/350259149175?zy_to=copy_link&share_count=1&m"
                            "=0cd13da8548a1bc85813d8c60d331e22&app=&type=post&did=d2bddf23159ae495&mid=1270840711117"
                            "&pid=350259149175")
-    print(pipi_funny.parse())
+    print(pipi_funny.get_video())

@@ -28,7 +28,7 @@ class PiPiXia(object):
         self.url = url
         self.session = requests.Session()
 
-    def parse(self):
+    def get_video(self):
         headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                           "Chrome/85.0.4183.102 Safari/537.36"
@@ -88,4 +88,4 @@ if __name__ == '__main__':
     # pipi = PiPiXia("https://h5.pipix.com/s/rR5Ppu")
     # pipi = PiPiXia("https://h5.pipix.com/s/JRjEVyT")
     # pipi = PiPiXia("https://h5.pipix.com/s/JAtW8Yg")
-    print(pi_pi.parse())
+    print(pi_pi.get_video())

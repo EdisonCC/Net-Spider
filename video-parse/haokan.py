@@ -9,7 +9,7 @@ class Bili(object):
     def __init__(self, bv):
         self.bv = bv
 
-    def get_url(self):
+    def get_video(self):
         url = self.bv
         if len(url) >= 23:
             base_url = url
@@ -50,5 +50,4 @@ class Bili(object):
 
 if __name__ == '__main__':
     bili = Bili("https://haokan.baidu.com/v?vid=11231414361411904045")
-    print(bili.get_url())
-© 2020 GitHub, Inc.
+    print(bili.get_video())
