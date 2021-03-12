@@ -17,7 +17,7 @@ class OpenEye(object):
         self.url = url
         self.session = requests.Session()
 
-    def get_url(self):
+    def get_video(self):
         headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                           "Chrome/85.0.4183.102 Safari/537.36",
@@ -54,4 +54,4 @@ class OpenEye(object):
 if __name__ == '__main__':
     open_eye = OpenEye(
         "https://www.eyepetizer.net/detail.html?vid=218858&utm_campaign=routine&utm_medium=share&utm_source=others&uid=0&resourceType=video&udid=7efd27ac2f9b4a69a5fd897d640a7f14b8a07aa6&vc=6030081&vn=6.3.8&size=900X1600&deviceModel=VOG-AL10&first_channel=oppo&last_channel=oppo&system_version_code=22")
-    print(open_eye.get_url())
+    print(open_eye.get_video())

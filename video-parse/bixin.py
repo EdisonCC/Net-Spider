@@ -17,7 +17,7 @@ class BiXin(object):
         self.url = url
         self.session = requests.Session()
 
-    def parse(self):
+    def get_video(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
             "Host": "h5.hibixin.com",
@@ -56,4 +56,4 @@ class BiXin(object):
 if __name__ == '__main__':
     bi_xin = BiXin("https://h5.hibixin.com/bixin/web-share/index?refer_page=ExploreDynamicDetailPage"
                    "&refer_share_channel=qqFriends#/?dynamic_id=1011146143398583404")
-    print(bi_xin.parse())
+    print(bi_xin.get_video())

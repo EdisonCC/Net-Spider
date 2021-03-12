@@ -17,7 +17,7 @@ class Vue(object):
         self.url = url
         self.session = requests.Session()
 
-    def parse(self):
+    def get_video(self):
         try:
             # 处理url，获取视频id
             pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.S)
@@ -50,4 +50,4 @@ class Vue(object):
 
 if __name__ == '__main__':
     vue = Vue("https://m.vuevideo.net/share/post/-4055236909604674237 898VLOG｜在大理看一场20:20日落 | VUE Vlog")
-    print(vue.parse())
+    print(vue.get_video())
