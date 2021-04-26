@@ -11,6 +11,9 @@ import requests
     1、模拟手机端请求，视频链接就添加在源码中。（最简单、但清晰度不好）
     2、通过调用别人的接口来下载视频。（根据接口的破解难度而定，可选择清晰度，不过最高的清晰度仅为未登录时能观看的最大清晰度）
     3、直接通过B站的网页版来抓取。（难度稍大，不过清晰度很好，有大会员的话，能下载4K视频）
+
+update 2021-04-26:
+    适配APP分享的视频地址
 """
 
 
@@ -27,13 +30,13 @@ class BiLiBiLi(object):
                           'Chrome/85.0.4183.121 Safari/537.36 Edg/85.0.564.63 '
         }
 
-    def get_video(self):
+    def parse(self):
         try:
             rows = self.session.get(url=self.url, headers=self.headers, timeout=10)
             if rows.status_code == 200:
                 html = rows.text
                 json_data = re.findall('window.__playinfo__=(.*?)</script>', html)[0]
-                video_name = re.findall('name="description" content="(.*?)">', html, re.S)[0]
+                video_name = re.findall('name="title" content="(.*?)">', html, re.S)[0]
                 cover = re.findall('property="og:image" content="(.*?)">', html, re.S)[0]
                 if video_name == '':
                     video_name = int(random.random() * 2 * 1000)
@@ -47,7 +50,7 @@ class BiLiBiLi(object):
                        - 测试下载为mp4格式，感觉也没差🙃🙃🙃
                 """
                 info = {
-                    "title": video_name,
+                    "title": str(video_name).split("_哔哩哔哩")[0],
                     "cover": cover,
                     "video": video,
                     "audio": audio,
@@ -66,7 +69,7 @@ class BiLiBiLi(object):
         :param save_path: 文件保存路径
         :return: None
         """
-        response = requests.get(url, headers=self.headers)
+        response = requests.get(url, headers=self.headers, stream=True)
         with open(save_path, 'wb') as f:
             f.write(response.content)
 
@@ -76,7 +79,7 @@ class BiLiPhone(object):
         self.bv = bv
         self.session = requests.Session()
 
-    def get_video(self):
+    def get_url(self):
         url = self.bv
         if len(url) >= 16:
             base_url = url
@@ -117,13 +120,21 @@ def core():
     print('*' * 5 + "\t\tAuthor: BadWoman\t\t" + '*' * 5)
     share_url = input('请输入分享链接: ')
     deal_url = re.findall('(http[s]?://[^\s]+)', share_url, re.S)[0]
-    choice = int(input("1、模拟手机端下载  2、调用接口下载  3、直接下载\n选择下载方式："))
+    choice = int(input("1、模拟手机端下载   2、直接下载\n选择下载方式："))
+    # 解决移动APP分享的视频地址
+    if "b23.tv" in deal_url:
+        headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                          "Chrome/88.0.4324.182 Safari/537.36 "
+        }
+        response = requests.get(deal_url, headers=headers, timeout=10)
+        deal_url = response.url
     if choice == 1:
-        return BiLiPhone(deal_url).get_video()
-    if choice == 2:
-        return "暂无，西蒂蒙"
-    if choice == 3:
-        return BiLiBiLi(deal_url).get_video()
+        return BiLiPhone(deal_url).get_url()
+    elif choice == 2:
+        return BiLiBiLi(deal_url).parse()
+    else:
+        return "暂无！"
 
 
 if __name__ == '__main__':
