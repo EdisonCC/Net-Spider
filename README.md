@@ -26,7 +26,7 @@
 | CSDN文章  | ✔ | [轻小说爬取](./轻小说与动漫列表大全/README.md) | ✔ | [陌陌登录](./模拟登录/陌陌) | ✔ |
 | 马蜂窝 | ✔ | [Pixiv](./国外网站/Pixiv/README.md) |✔ | [YouTube](./国外网站/YouTube/README.md)|✔ |
 | [奇漫屋](./漫画/奇漫屋) | ✔ | [Pornhub](./video-parse/pornhub.py) | ✔ | [QQ音乐](./音乐/QQ音乐/README.md) | ✔ |
-| [网易云音乐](./音乐/网易云音乐/README.md) | ✔ |  |  |  |  |
+| [网易云音乐](./音乐/网易云音乐/README.md) | ✔ | [图集](./图集/kuai_pic.py) | ✔ |  |  |
 
 <br>
 
