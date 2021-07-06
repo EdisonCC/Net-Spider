@@ -51,7 +51,7 @@ class XiGua(object):
                     # 处理特殊字符,并字典化
                     doc = json.loads(doc.encode('raw_unicode_escape').decode())
                     result = doc["anyVideo"]["gidInformation"]["packerData"]["video"]
-                    cover = doc["anyVideo"]["gidInformation"]["packerData"]["pSeries"]["firstVideo"]["middle_image"]["url"]
+                    # cover = doc["anyVideo"]["gidInformation"]["packerData"]["pSeries"]["firstVideo"]["middle_image"]["url"]
                     # 获取标题
                     title = result["title"]
                     # 获取音视频合一的视频，但有水印存在
@@ -60,15 +60,27 @@ class XiGua(object):
                     # 获取无水印，但音视频分割的视频地址
                     video_url = result["videoResource"]["dash"]["dynamic_video"]["dynamic_video_list"][-1].get("main_url", "backup_url_1")
                     audio_url = result["videoResource"]["dash"]["dynamic_video"]["dynamic_audio_list"][-1].get("main_url", "backup_url_1")
-                    info = {
-                        "title": title,
-                        "quality": quality,
-                        "cover": cover,
-                        "video_url": base64.b64decode(video_url).decode("utf-8"),
-                        "audio_url": base64.b64decode(audio_url).decode("utf-8"),
-                        "wm_video_url": base64.b64decode(wm_video_url).decode("utf-8"),
-                        "description": "本api会选择视频清晰度最高的视频；西瓜视频的音视频是分离开的，请搭配使用剪辑软件拼接音视频源（wm_video_url是音视频合一的，但存在水印）"
-                    }
+                    # 大部分视频是没有cover的，这里加了个判断
+                    try:
+                        cover = doc["anyVideo"]["gidInformation"]["packerData"]["pSeries"]["firstVideo"]["middle_image"]["url"]
+                        info = {
+                            "title": title,
+                            "quality": quality,
+                            "cover": cover,
+                            "video_url": base64.b64decode(video_url).decode("utf-8"),
+                            "audio_url": base64.b64decode(audio_url).decode("utf-8"),
+                            "wm_video_url": base64.b64decode(wm_video_url).decode("utf-8"),
+                            "description": "本api会选择视频清晰度最高的视频；西瓜视频的音视频是分离开的，请搭配使用剪辑软件拼接音视频源（wm_video_url是音视频合一的，但存在水印）"
+                        }
+                    except Exception as e:
+                        info = {
+                            "title": title,
+                            "quality": quality,
+                            "video_url": base64.b64decode(video_url).decode("utf-8"),
+                            "audio_url": base64.b64decode(audio_url).decode("utf-8"),
+                            "wm_video_url": base64.b64decode(wm_video_url).decode("utf-8"),
+                            "description": "本api会选择视频清晰度最高的视频；西瓜视频的音视频是分离开的，请搭配使用剪辑软件拼接音视频源（wm_video_url是音视频合一的，但存在水印）"
+                        }
                     return json.dumps(info, ensure_ascii=False)
                 except Exception as e:
                     return json.dumps({"info": "暂无相关数据，请检查相关数据：" + str(e)}, ensure_ascii=False)
